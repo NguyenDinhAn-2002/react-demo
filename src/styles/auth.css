@@ -1,30 +1,84 @@
-.auth-container {
-    max-width: 300px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    text-align: center;
-  }
-  
-  .auth-container input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .auth-container button {
-    width: 100%;
-    padding: 10px;
-    background-color: blue;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .auth-container p {
-    margin-top: 10px;
-  }
-  
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body > #root {
+  display: flex;
+  min-height: 100vh;
+  margin: auto;
+  background-color: #f0f0f0;
+}
+
+body > #root > form {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  width: 350px;
+  background-color: #fff;
+}
+
+#form .heading {
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.spacer {
+  margin-bottom: 20px;
+}
+
+.form__group{
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.form__label {
+  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.form__input {
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.form__input:focus {
+  outline: none;
+  border-color: #1e32e0;
+}
+
+.form__input:hover {
+  border-color: #1e32e0;
+}
+
+.form__message--error {
+  font-size: 16px;
+  color: red;
+}
+
+.form__submit {
+  font-size: 18px;
+  padding: 5px;
+  border: none;
+  border-radius: 5px;
+  background-color: #1e32e0;
+  color: white;
+  cursor: pointer;
+  margin-top: 8px;
+}
