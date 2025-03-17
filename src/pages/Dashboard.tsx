@@ -13,7 +13,18 @@ const Dashboard = () => {
     }
   }, [navigate]);  
 
-  return <h2>Chào mừng, {JSON.parse(localStorage.getItem("loggedInUser") || "{}").username}!</h2>;
+  const handleLogout = () => {
+    localStorage.removeItem("loggedInUser");
+    alert("Bạn đã đăng xuất!");
+    navigate("/login");
+  };
+
+  return (
+    <div>
+      <h2>Chào mừng, {JSON.parse(localStorage.getItem("loggedInUser") || "{}").username}!</h2>
+      <button onClick={handleLogout}>Đăng xuất</button>
+    </div>
+  );
 };
 
 export default Dashboard;
