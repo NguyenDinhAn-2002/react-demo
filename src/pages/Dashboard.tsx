@@ -1,29 +1,33 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 const Dashboard = () => {
+  const { user, logout } = useContext(AuthContext) as { user: { username: string; password: string }; logout: () => void };
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "null");
-    
-    if (!loggedInUser) {
-      alert("Bạn chưa đăng nhập!");
+    if (!user.username || !user.password) {
       navigate("/login");  
     }
-  }, [navigate]);  
+  }, [navigate, user]);  
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedInUser");
-    alert("Bạn đã đăng xuất!");
+    logout();
     navigate("/login");
   };
 
   return (
-    <div>
-      <h2>Chào mừng, {JSON.parse(localStorage.getItem("loggedInUser") || "{}").username}!</h2>
-      <button onClick={handleLogout}>Đăng xuất</button>
-    </div>
+    <>
+      {user.username && user.password && (
+        <div className="auth-container">
+          <h2 className="heading">Dashboard</h2>
+          <p>Xin chào, {user.username}!</p>
+          <button className="form__submit" onClick={handleLogout}>Đăng xuất</button>
+        </div>
+      )}
+    </>
   );
 };
 

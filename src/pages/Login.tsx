@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 const Login = () => {
+  const authContext = useContext(AuthContext);
+  const { login } = authContext;
+
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
@@ -22,7 +27,7 @@ const Login = () => {
 
     if (storedUser.username === loginData.username && storedUser.password === loginData.password) {
       alert("Đăng nhập thành công!");
-      localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
+      login(loginData.username, loginData.password);
       navigate("/dashboard"); 
     } else {
       setError("Tên đăng nhập hoặc mật khẩu không đúng!");
