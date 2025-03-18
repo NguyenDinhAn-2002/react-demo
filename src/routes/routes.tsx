@@ -20,12 +20,12 @@ const punlicRoutes = [
     {
         path: '/login',
         component: Login,
-        layout: DefaultLayout,
+        layout: null,
     },
     {
         path: '/register',
         component: Register,
-        layout: DefaultLayout,
+        layout: null,
     },
 ];
 

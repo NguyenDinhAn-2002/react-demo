@@ -2,7 +2,12 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
+
+import classNames from "classnames/bind";
+import styles from "./Login.module.scss";
+
+const cx = classNames.bind(styles);
 
 const Login = () => {
   const authContext = useContext(AuthContext);
@@ -36,24 +41,32 @@ const Login = () => {
   };
 
   return (
-    <form id="form" onSubmit={handleSubmit} className="auth-container">
-      <h2 className="heading">Đăng nhập</h2>
-      <span className="form__message--error">{error}</span>
-      <div className="spacer"></div>
-      <div className="form__group">
-        <label htmlFor="username" className="form__label">Tên đăng nhập</label>
-        <input id="username" className="form__input" type="text" name="username" placeholder="Tên đăng nhập" onChange={handleChange} required />
+    <div className={cx("login")}>
+      <div className={cx("card")}>
+        <div className={cx("left")}>
+          <h1>Hello World.</h1>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero cum,
+            alias totam numquam ipsa exercitationem dignissimos, error nam,
+            consequatur.
+          </p>
+          <span>Don't you have an account?</span>
+          <Link to="/register">
+            <button>Register</button>
+          </Link>
+        </div>
+        <div className={cx("right")}>
+          <h1>Login</h1>
+          <span className={cx("error")}>{error}</span>
+          <form>
+            <input type="text" placeholder="Username" onChange={handleChange} />
+            <input type="password" placeholder="Password" onChange={handleChange} />
+            <span className={cx("error")}>{errorPassword}</span>
+            <button onClick={handleSubmit}>Login</button>
+          </form>
+        </div>
       </div>
-      <div className="form__group">
-        <label htmlFor="password" className="form__label">Mật khẩu</label>
-        <input id="password" className="form__input" type="password" name="password" placeholder="Mật khẩu" onChange={handleChange} required />
-        <span className="form__message--error">{errorPassword}</span>
-      </div>
-      <div className="form__group">
-        <button className="form__submit" type="submit">Đăng nhập</button>
-      </div>
-      <p>Chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
-    </form>
+    </div>
   );
 };
 
