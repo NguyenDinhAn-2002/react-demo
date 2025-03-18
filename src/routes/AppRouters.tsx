@@ -1,16 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Register from "../pages/Register";
-import Login from "../pages/Login";
-import Dashboard from "../pages/Dashboard";
+import { punlicRoutes } from "./routes";
 
 const AppRoutes = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        {punlicRoutes.map((route, index) => {
+          const Page = route.component;
+          const Layout = route.layout;
+
+          return (
+            <Route
+              key={index}
+              path={route.path}
+              element={<Layout><Page /></Layout>}
+            />
+          );
+        })}
       </Routes>
     </Router>
   );
