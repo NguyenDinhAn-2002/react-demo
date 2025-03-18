@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
@@ -51,7 +52,7 @@ const Login = () => {
       <div className="form__group">
         <button className="form__submit" type="submit">Đăng nhập</button>
       </div>
-      <p>Chưa có tài khoản? <a href="/register">Đăng ký</a></p>
+      <p>Chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
     </form>
   );
 };
