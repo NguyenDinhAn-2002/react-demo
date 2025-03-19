@@ -1,11 +1,12 @@
+import { BrowserRouter as Router } from "react-router-dom";
 import AppRoutes from "./routes/AppRouters";
-import { AuthProvider } from "./contexts/AuthContext";
+
 import "./styles/main.css";
 const App = () => {
   return (
-    <AuthProvider>
+    <Router>
       <AppRoutes />
-    </AuthProvider>
+    </Router>
   );
 };
 

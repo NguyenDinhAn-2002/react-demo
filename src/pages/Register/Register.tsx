@@ -1,32 +1,36 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { register } from "../../redux/slices/authSlice";
 import classNames from "classnames/bind";
 import styles from "./Register.module.scss";
 
 const cx = classNames.bind(styles);
 
 const Register = () => {
-  const [user, setUser] = useState({ username: "", password: "" });
-  const [errorPassword, setErrorPassword] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.name === "password" && e.target.value.length < 6) {
-      setErrorPassword("Mật khẩu phải có ít nhất 6 ký tự!");
-      return;
-    }
-    setUser({ ...user, [e.target.name]: e.target.value });
-    setErrorPassword("");
-  };
+  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("mockUser", JSON.stringify(user));
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const username = formData.get("username")?.toString().trim();
+    const password = formData.get("password")?.toString().trim();
+
+    if (!username || !password) {
+      alert("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+
+    dispatch(register({ username, password }));
+
     alert("Đăng ký thành công!");
     navigate("/login"); 
   };
+  
 
   return (
     <div className={cx("register")}>
@@ -46,9 +50,9 @@ const Register = () => {
         <div className={cx("right")}>
           <h1>Register</h1>
           <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Username" name="username" onChange={handleChange} />
-            <input type="password" placeholder="Password" name="password" onChange={handleChange} />
-            {errorPassword && <span>{errorPassword}</span>}
+            <input type="text" placeholder="Username" name="username"  />
+            <input type="password" placeholder="Password" name="password" />
+            
             <button type="submit">Register</button>
           </form>
         </div>

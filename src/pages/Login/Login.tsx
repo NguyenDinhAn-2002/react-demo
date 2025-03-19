@@ -1,43 +1,44 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../../contexts/AuthContext";
-
+import { login } from "../../redux/slices/authSlice";
+import { useEffect } from "react";
 import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
 
 const cx = classNames.bind(styles);
 
 const Login = () => {
-  const authContext = useContext(AuthContext);
-  const { login } = authContext;
-
-  const [loginData, setLoginData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
-  const [errorPassword, setErrorPassword] = useState("");
+  
   const navigate = useNavigate();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.name === "password" && e.target.value.length < 6) {
-      setErrorPassword("Mật khẩu phải có ít nhất 6 ký tự!");
-      return;
-    }
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
-    setErrorPassword("");
-  };
+  const dispatch = useDispatch();
+  const { isLogin } = useSelector((state: RootState) => state.auth);
+  useEffect(() => {
+    console.log(isLogin);
+    if (isLogin) navigate("/"); 
+  }, [isLogin, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const storedUser = JSON.parse(localStorage.getItem("mockUser") || "{}");
+    e.preventDefault(); 
+    const formData = new FormData(e.target as HTMLFormElement);
+    const values = {
+      username: formData.get("username") as string,
+      password: formData.get("password") as string,
+    };
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const savedUser = users.find((u: { username: string; password: string }) =>
+      u.username === values.username && u.password === values.password
+    );
 
-    if (storedUser.username === loginData.username && storedUser.password === loginData.password) {
-      alert("Đăng nhập thành công!");
-      login(loginData.username, loginData.password);
-      navigate("/dashboard"); 
+    if (savedUser) {
+      console.log("Dang nhap thanh cong");
+      dispatch(login(savedUser));
+      navigate("/");
     } else {
-      setError("Tên đăng nhập hoặc mật khẩu không đúng!");
+      console.log("Sai tên đăng nhập hoặc mật khẩu!");
     }
+
   };
 
   return (
@@ -57,12 +58,12 @@ const Login = () => {
         </div>
         <div className={cx("right")}>
           <h1>Login</h1>
-          <span className={cx("error")}>{error}</span>
-          <form>
-            <input type="text" placeholder="Username" onChange={handleChange} />
-            <input type="password" placeholder="Password" onChange={handleChange} />
-            <span className={cx("error")}>{errorPassword}</span>
-            <button onClick={handleSubmit}>Login</button>
+          
+          <form onSubmit={handleSubmit}>
+            <input type="text" placeholder="Username" name="username" />
+            <input type="password" placeholder="Password" name="password"  />
+            
+            <button type="submit">Login</button>
           </form>
         </div>
       </div>

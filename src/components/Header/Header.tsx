@@ -1,18 +1,15 @@
-import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { Link } from "react-router-dom";
-import { AuthContext } from "../../../contexts/AuthContext";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../redux/store";
+import { logout } from "../../redux/slices/authSlice";
 
 const Header = () => {
-	const { user, logout } = useContext(AuthContext) as { user: { username: string; password: string }; logout: () => void };
-	const navigate = useNavigate();
-
-	const handleLogout = () => {
-		localStorage.removeItem("mockUser");
-		logout();
-		navigate("/login");
-	};
-
+	const dispatch = useDispatch();
+	const { isLogin } = useSelector((state: RootState) => state.auth);
+	const user = useSelector((state: RootState) => state.auth.user);
+	console.log(isLogin);
+	
 	return (
 		<header>
 			<nav className="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -43,8 +40,14 @@ const Header = () => {
 							</li>
 						</ul>
 
-						{user.username === "" && user.password === "" ? (
-							<ul className="navbar-nav">
+						{user ? (
+          <>
+            <span>Xin chào, {user.username}</span>
+            <button onClick={() => dispatch(logout())}>Đăng xuất</button>
+          </>
+        ) : (
+          <>
+            <ul className="navbar-nav">
 								<li className="nav-item mx-2">
 									<Link
 										className="btn btn-primary"
@@ -62,9 +65,8 @@ const Header = () => {
 									</Link>
 								</li>
 							</ul>
-						) : (
-							<button className="form__submit" onClick={handleLogout}>Đăng xuất</button>
-						)}
+          </>
+        )}
 					</div>
 				</div>
 			</nav>
