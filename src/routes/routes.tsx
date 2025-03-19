@@ -4,17 +4,17 @@ import DefaultLayout from "../layouts";
 // Pages
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import Dashboard from "../pages/Dashboard";
+import Home from "../pages/Home";
 
 const punlicRoutes = [
     {
         path: '/',
-        component: Dashboard,
+        component: Home,
         layout: DefaultLayout,
     },
     {
-        path: '/dashboard',
-        component: Dashboard,
+        path: '/home',
+        component: Home,
         layout: DefaultLayout,
     },
     {

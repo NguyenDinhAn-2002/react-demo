@@ -32,9 +32,8 @@ const Login = () => {
     const storedUser = JSON.parse(localStorage.getItem("mockUser") || "{}");
 
     if (storedUser.username === loginData.username && storedUser.password === loginData.password) {
-      alert("Đăng nhập thành công!");
       login(loginData.username, loginData.password);
-      navigate("/dashboard"); 
+      navigate("/home"); 
     } else {
       setError("Tên đăng nhập hoặc mật khẩu không đúng!");
     }
@@ -59,8 +58,8 @@ const Login = () => {
           <h1>Login</h1>
           <span className={cx("error")}>{error}</span>
           <form>
-            <input type="text" placeholder="Username" onChange={handleChange} />
-            <input type="password" placeholder="Password" onChange={handleChange} />
+            <input type="text" name="username" placeholder="Username" onChange={handleChange} />
+            <input type="password" name="password" placeholder="Password" onChange={handleChange} />
             <span className={cx("error")}>{errorPassword}</span>
             <button onClick={handleSubmit}>Login</button>
           </form>

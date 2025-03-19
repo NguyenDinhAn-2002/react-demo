@@ -24,7 +24,6 @@ const Register = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("mockUser", JSON.stringify(user));
-    alert("Đăng ký thành công!");
     navigate("/login"); 
   };
 
