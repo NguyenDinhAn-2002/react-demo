@@ -1,25 +1,27 @@
 export interface User {
+    id: string,
     username : string,
     password : string,
     role: string,
-    createdAt: Date
+    createdAt: number
 }
 
-export interface UserState {
-    user: User | null,
-    isLogin: boolean
-}
 
 export interface Follow {
     followingUserId: number,
     followedUserId: number,
-    createdAt: Date
+    createdAt: number
 }
-
 export interface Post {
+    id: string,
     title: string,
     body: string,
-    userId: number,
+    userId: string,
     status: boolean,
-    createdAt: Date
+    likes: string[],
+    createdAt: number
+}
+export interface UserState {
+    user: User | null,
+    isLogin: boolean
 }
