@@ -7,7 +7,6 @@ import {
   PeopleAlt,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
-import { logout } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
 
 function LeftBar() {
@@ -15,7 +14,7 @@ function LeftBar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    currentUser.logout();
     navigate("/login");
   }
 
