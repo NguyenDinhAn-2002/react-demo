@@ -1,108 +1,76 @@
-import {
-  AppBar,
-  Avatar,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Typography,
-  styled,
-} from "@mui/material";
-import PetsIcon from "@mui/icons-material/Pets";
-import InputBase from "@mui/material/InputBase";
-import Badge from "@mui/material/Badge";
-import Mail from "@mui/icons-material/Mail";
-import { Notifications } from "@mui/icons-material";
+import { Typography, Avatar } from "@mui/material";
+import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
+import CustomMenu from "../CustomMenu/CustomMenu";
+import images from "../../assets/img";
+import { Link } from "react-router-dom";
+import "./Navbar.scss";
+import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../redux/store";
-import { logout } from "../../redux/slices/authSlice";
-const Search = styled("div")({
-  backgroundColor: "white",
-  padding: "0px 10px",
-  borderRadius: "5px",
-  width: "40%",
-});
-const Icons = styled("div")({
-  gap: "20px",
-  alignItems: "center",
-});
-const UserBox = styled("div")({
-  gap: "10px",
-  alignItems: "center",
-});
 const Navbar = () => {
-  const [open, setOpen] = useState<boolean>(false);
+  const user = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-  const dispatch = useDispatch();
-  const { isLogin } = useSelector((state: RootState) => state.auth);
-  const user = useSelector((state: RootState) => state.auth.user);
-  console.log(isLogin);
+  const [openMenu, setOpenMenu] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const menuItems = [
+    { label: user?.user?.username || "Người dùng", onClick: () => {} },
+    { label: "Hồ sơ của bạn", onClick: () => console.log("Xem hồ sơ") },
+    { label: "Đăng xuất", onClick: () => setConfirmLogout(true) },
+  ];
+  const handleLogout = () => {
+    user.logout();
+    setConfirmLogout(false);
+    setOpenMenu(false);
+  };
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: "#427fed" }}>
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h6" sx={{ display: { xs: "none", sm: "block" } }}>
-          QNUwU
-        </Typography>
-        <PetsIcon sx={{ display: { xs: "flex", sm: "none" } }} />
-        <Search>
-          {" "}
-          <InputBase placeholder="Tìm kiếm..." />{" "}
-        </Search>
-        <Typography
-          variant="h6"
-          sx={{ display: { xs: "none", sm: "block" }, fontSize: "0.9rem" }}
-        >
-          Xin chào,{user?.username}
-        </Typography>
+    <>
+      <div className="navbar">
+        <div className="left">
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <span>QNUwU</span>
+          </Link>
+          <Link to="/home" style={{ textDecoration: "none" }}>
+            <Avatar
+              src={images.logo}
+              alt="Logo"
+              sx={{ width: 50, height: 50 }}
+            />
+          </Link>
+        </div>
+        <div className="right">
+          <Typography
+            variant="h6"
+            sx={{ display: { xs: "none", sm: "block" }, fontSize: "0.9rem" }}
+          >
+            <span>Xin chào, {user.user?.username}</span>
+          </Typography>
+          <div className="user">
+            <Avatar
+              onClick={(event: React.MouseEvent<HTMLDivElement>) => {
+                setAnchorEl(event.currentTarget);
+                setOpenMenu(true);
+              }}
+              sx={{ width: 40, height: 40 }}
+            />
+            <CustomMenu
+              anchorEl={anchorEl}
+              open={openMenu}
+              onClose={() => setOpenMenu(false)}
+              items={menuItems}
+            />
 
-        <Icons sx={{ display: { sm: "flex", xs: "none" } }}>
-          <Badge badgeContent={4} color="error">
-            <Mail />
-          </Badge>
-          <Badge badgeContent={4} color="error">
-            <Notifications />
-          </Badge>
-          <Avatar
-            onClick={(event: React.MouseEvent<HTMLDivElement>) => {
-              setAnchorEl(event.currentTarget);
-              setOpen(true);
-            }}
-            sx={{ width: 44, height: 44 }}
-            src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRWHUlglb3rvNRICOL2fGg5JtijTgjPAMzCtJYIthlsCxDtxIXS"
-          />
-        </Icons>
-        <UserBox sx={{ display: { xs: "flex", sm: "none" } }}>
-          <Avatar
-            sx={{ width: 30, height: 30 }}
-            src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRWHUlglb3rvNRICOL2fGg5JtijTgjPAMzCtJYIthlsCxDtxIXS"
-          />
-          <Typography variant="h6">QNUwU</Typography>
-        </UserBox>
-        <Menu
-          id="fade-menu"
-          MenuListProps={{
-            "aria-labelledby": "fade-button",
-          }}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={() => {
-            setOpen(false);
-          }}
-        >
-          <MenuItem>{user?.username}</MenuItem>
-          <MenuItem>Hồ sơ của bạn</MenuItem>
-          <MenuItem onClick={() => dispatch(logout())}>Đăng xuất</MenuItem>
-        </Menu>
-      </Toolbar>
-    </AppBar>
+            <ConfirmDialog
+              open={confirmLogout}
+              onClose={() => setConfirmLogout(false)}
+              onConfirm={handleLogout}
+              title="Xác nhận đăng xuất"
+              content="Bạn có chắc chắn muốn đăng xuất không?"
+              confirmText="Đăng xuất"
+              cancelText="Hủy"
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

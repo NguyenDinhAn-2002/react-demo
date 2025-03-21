@@ -1,22 +1,34 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-import Layout from "../layout/Layout";
-import Register from "../pages/Register";
-import Login from "../pages/Login";
-import Home from "../pages/Home";
-const AppRoutes = () => {
-  const auth = useSelector((state: RootState) => state.auth.isLogin); 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { publicRoutes, RouteGuard } from "./routes";
+import { Fragment } from "react";
+import DefaultLayout from "../layouts";
 
+const AppRoutes = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={auth ? <Navigate to="/home" /> : <Navigate to="/login" />} />
-        <Route path="home" element={auth ? <Home /> : <Navigate to="/login" />} />
-        <Route path="register" element={<Register />} />
-        <Route path="login" element={<Login />} />
-      </Route>
-    </Routes>
+    <Router>
+      <Routes>
+        {publicRoutes.map(
+          ({ path, component: Component, layout, requiresAuth }, index) => {
+            const Layout = layout === null ? Fragment : layout || DefaultLayout;
+            return (
+              <Route
+                key={index}
+                path={path}
+                element={
+                  <RouteGuard requiresAuth={requiresAuth}>
+                    <Layout>
+                      <Component />
+                    </Layout>
+                  </RouteGuard>
+                }
+              >
+                <Route index element={<Component />} />
+              </Route>
+            );
+          },
+        )}
+      </Routes>
+    </Router>
   );
 };
 

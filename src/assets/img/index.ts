@@ -12,7 +12,9 @@ import img1 from "./img1.jpg";
 import img2 from "./img2.jpg";
 import img3 from "./img3.jpg";
 import img4 from "./img4.jpg";
-
+import logo from "./logo.jpg";
+import bg from "./bg.jpg";
+import bg2 from "./bg2.jpg";
 const images: { [key: string]: string } = {
   avatar1,
   avatar2,
@@ -28,6 +30,9 @@ const images: { [key: string]: string } = {
   img2,
   img3,
   img4,
+  logo,
+  bg,
+  bg2,
 };
 
 export default images;

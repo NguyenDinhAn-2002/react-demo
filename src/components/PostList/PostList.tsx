@@ -1,17 +1,29 @@
-import { RootState } from "../../redux/store";
-import { useSelector } from "react-redux";
-import Post from "../Post/Post";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 
-const PostList = () => {
-  const posts = useSelector((state: RootState) => state.posts.posts);
-  const sortedPosts = useMemo(() => {
-    return [...posts].sort((a, b) => b.createdAt - a.createdAt);
-  }, [posts]);
+import "./PostList.scss";
+import PostItem from "../Post";
+import { fetchPosts, Post } from "../../api/postApi";
+import { useAuth } from "../../contexts/AuthContext";
 
-  const postsList = sortedPosts.map((post) => <Post key={post.id} post={post} />);
+const PostList = ({ refresh }: { refresh: boolean }) => {
+  const user = useAuth();
+  const [posts, setPosts] = useState<Post[]>([]);
 
-  return <div>{posts.length > 0 ? postsList : <p>Chưa có bài viết nào.</p>}</div>;
+  useEffect(() => {
+    setPosts(fetchPosts());
+  }, [refresh]);
+
+  return (
+    <div className="posts">
+      {posts.map((post) => (
+        <PostItem
+          key={post.id}
+          post={post}
+          currentUserId={user?.user?.id || 0}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default PostList;

@@ -1,118 +1,98 @@
-import { Avatar, AvatarGroup, Divider, ImageList, ImageListItem, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material"
-import Box from "@mui/material/Box"
-import React from "react"
-import images from '../../assets/img'; 
+import { useState, useEffect } from "react";
+import { getAllUsers, getCurrentUser } from "../../api/authApi";
+import { followUser, getFollowing } from "../../api/followApi";
+import { Typography, Avatar } from "@mui/material";
+import "./rightBar.scss";
+const RightBar = () => {
+  const [suggestedUsers, setSuggestedUsers] = useState<
+    { id: number; username: string }[]
+  >([]);
+  const [followingList, setFollowingList] = useState<
+    { id: number; username: string }[]
+  >([]);
 
-const Rightbar = () => {
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    const allUsers = getAllUsers();
+    const followingIds = getFollowing(user.id);
+
+    const notFollowedUsers = allUsers.filter(
+      (u) => !followingIds.includes(u.id) && u.id !== user.id,
+    );
+    setSuggestedUsers(notFollowedUsers);
+
+    const followedUsers = allUsers.filter((u) => followingIds.includes(u.id));
+    setFollowingList(followedUsers);
+  }, []);
+
+  const handleFollow = (userId: number) => {
+    const user = getCurrentUser();
+    if (!user) return alert("Bạn cần đăng nhập!");
+
+    followUser(user.id, userId);
+    setSuggestedUsers((prev) => prev.filter((u) => u.id !== userId));
+    setFollowingList((prev) => [
+      ...prev,
+      suggestedUsers.find((u) => u.id === userId)!,
+    ]);
+  };
+
+  const handleDismiss = (userId: number) => {
+    setSuggestedUsers((prev) => prev.filter((u) => u.id !== userId));
+  };
+
   return (
-    <Box bgcolor="white" flex={2} p={2} sx={{display:{xs:"none" , sm:"block"}}} >
-      <Box position="fixed" marginTop={10}> 
-        <Typography variant="h6" fontWeight={500}> Bạn bè </Typography>
-        <AvatarGroup total={9} max={7}>
-          <Avatar alt="Alisa Mikhailovna Kujou" src={images.avatar1} />
-          <Avatar alt="Shiroko" src={images.avatar2} />
-          <Avatar alt="Hoshino" src={images.avatar3} />
-         
-          <Avatar alt="Nahida" src={images.avatar4} />
-          <Avatar alt="Arisu" src={images.avatar5} />
-          <Avatar alt="Raiden" src={images.avatar6} />
-        </AvatarGroup>
-        <Typography variant="h6" fontWeight={500} mt={2} mb={2} >Bài đăng gần đây </Typography>
-        <ImageList cols={3} gap={5} rowHeight={100}>
-          <ImageListItem >
-            <img
-              src={images.img1}
-              alt={`Breakfast`}
-              loading="lazy"
-            />
-        </ImageListItem>
-        <ImageListItem >
-            <img
-              src={images.img2}
-              alt={`Breakfast`}
-              loading="lazy"
-            />
-        </ImageListItem>
-        <ImageListItem >
-            <img
-              src={images.img3}
-              alt={`Breakfast`}
-              loading="lazy"
-            />
-        </ImageListItem>
-        </ImageList>
-        <Typography variant="h6" fontWeight={500} mt={2} mb={2} > Hội thoại </Typography>
-        <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="The loli" src={images.avatar7} />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Are you here?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                The loli
-              </Typography>
-              {" — I'll call FBI…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="The Artist" src={images.avatar8} />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Ein Volk, Ein Reich, Ein Führer!"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                The Artist
-              </Typography>
-              {" — When diplomacy ends, War begins.…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Perrell Laquarius Brown" src={images.avatar9} />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Anbatukam"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                
-              </Typography>
-              {' — Well you know if you know…'}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-    </List>
+    <div className="rightBar">
+      <div className="container">
+        <div className="item">
+          <Typography variant="h6" fontWeight="bold">
+            Người bạn có thể biết
+          </Typography>
 
-      </Box>
-    </Box>
-  )
-}
+          {suggestedUsers.length === 0 ? (
+            <div>
+              <span>Không còn ai để gợi ý.</span>
+            </div>
+          ) : (
+            suggestedUsers.map((user) => (
+              <div key={user.id} className="user">
+                <div className="userInfo">
+                  <Avatar src="" alt="" />
+                  <span>{user.username}</span>
+                </div>
+                <div className="buttons">
+                  <button onClick={() => handleFollow(user.id)}>Follow</button>
+                  <button onClick={() => handleDismiss(user.id)}>
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="item">
+          <Typography variant="h6" fontWeight="bold">
+            Đang theo dõi
+          </Typography>
 
-export default Rightbar
+          {followingList.length === 0 ? (
+            <span>Bạn chưa follow ai.</span>
+          ) : (
+            followingList.map((user) => (
+              <div key={user.id} className="user">
+                <div className="userInfo">
+                  <Avatar />
+                  <span>{user.username}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RightBar;
