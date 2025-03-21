@@ -54,6 +54,7 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
       createdAt: Date.now(),
     });
 
+    setConfirmPost(false);
     setAlertMessage("Đăng bài thành công!");
     setAlertSeverity("success");
     setTimeout(() => setAlertMessage(null), 5000);

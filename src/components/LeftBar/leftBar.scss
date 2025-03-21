@@ -68,6 +68,16 @@
           }
         }
       }
+
+      .item {
+        .btn-logout {
+          background-color: themed("primary");
+          color: rgb(60, 17, 214);
+          padding: 5px 10px;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+      }
     }
   }
 }

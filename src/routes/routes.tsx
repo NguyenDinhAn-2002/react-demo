@@ -4,7 +4,6 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Home from "../pages/Home/Home";
 import { useAuth } from "../contexts/AuthContext";
-import { useEffect, useState } from "react";
 
 interface RouteItem {
   path: string;

@@ -7,9 +7,18 @@ import {
   PeopleAlt,
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
+import { logout } from "../../api/authApi";
+import { useNavigate } from "react-router-dom";
 
 function LeftBar() {
   const currentUser = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  }
+
   return (
     <div className="leftBar">
       <div className="container">
@@ -36,6 +45,9 @@ function LeftBar() {
           </div>
         </div>
         <hr />
+        <div className="item">
+          <button className="btn-logout" onClick={() => handleLogout()}>Đăng xuất</button>
+        </div>
       </div>
     </div>
   );
