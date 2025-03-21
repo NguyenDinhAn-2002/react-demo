@@ -1,69 +1,87 @@
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../redux/store";
+import { Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../redux/slices/authSlice";
-import { useEffect } from "react";
+import { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
-
+import { useAuth } from "../../contexts/AuthContext";
+import images from "../../assets/img";
+const bgStyle = {
+  "--bg-image": `url(${images.bg})`,
+} as React.CSSProperties;
 const cx = classNames.bind(styles);
 
 const Login = () => {
-  
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { isLogin } = useSelector((state: RootState) => state.auth);
-  useEffect(() => {
-    console.log(isLogin);
-    if (isLogin) navigate("/"); 
-  }, [isLogin, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); 
-    const formData = new FormData(e.target as HTMLFormElement);
-    const values = {
-      username: formData.get("username") as string,
-      password: formData.get("password") as string,
-    };
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const savedUser = users.find((u: { username: string; password: string }) =>
-      u.username === values.username && u.password === values.password
-    );
-
-    if (savedUser) {
-      console.log("Dang nhap thanh cong");
-      dispatch(login(savedUser));
-      navigate("/");
-    } else {
-      console.log("Sai tên đăng nhập hoặc mật khẩu!");
+  const user = useAuth();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!username.trim() || !password.trim()) {
+      setError("Vui lòng điền đầy đủ thông tin!");
+      return;
     }
 
+    try {
+      const authUser = await user.login(username, password);
+
+      if (authUser) {
+        setSuccess("Đăng nhập thành công!");
+        setTimeout(() => {
+          console.log("Navigating to /home");
+          navigate("/home");
+        }, 2000);
+      } else {
+        setError("Sai tên đăng nhập hoặc mật khẩu!");
+      }
+    } catch (err) {
+      setError("Đã xảy ra lỗi khi đăng nhập!");
+    }
   };
 
   return (
     <div className={cx("login")}>
       <div className={cx("card")}>
-        <div className={cx("left")}>
-          <h1>Hello World.</h1>
+        <div className={cx("left")} style={bgStyle}>
+          <h1>QNUwU</h1>
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero cum,
-            alias totam numquam ipsa exercitationem dignissimos, error nam,
-            consequatur.
+            QNUwU-Trường Đại học Quy Nhơn (QNU) là một trường đại học công lập
+            đa ngành tại TP. Quy Nhơn, tỉnh Bình Định. Thành lập năm 1977, QNU
+            đào tạo từ bậc đại học đến sau đại học với các lĩnh vực như sư phạm,
+            kinh tế, kỹ thuật, công nghệ thông tin, khoa học tự nhiên và xã hội.
+            Trường có cơ sở vật chất hiện đại, đội ngũ giảng viên chất lượng, và
+            là trung tâm nghiên cứu khoa học quan trọng của khu vực Nam Trung Bộ
+            – Tây Nguyên.
           </p>
-          <span>Don't you have an account?</span>
+          <span>Chưa có tài khoản?</span>
           <Link to="/register">
-            <button>Register</button>
+            <button>Đăng ký</button>
           </Link>
         </div>
         <div className={cx("right")}>
-          <h1>Login</h1>
-          
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="error">{success}</Alert>}
+          <h1>Đăng nhập</h1>
+
           <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Username" name="username" />
-            <input type="password" placeholder="Password" name="password"  />
-            
-            <button type="submit">Login</button>
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <button type="submit">Đăng nhập</button>
           </form>
         </div>
       </div>

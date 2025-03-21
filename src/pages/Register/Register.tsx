@@ -1,59 +1,104 @@
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { register } from "../../redux/slices/authSlice";
 import classNames from "classnames/bind";
 import styles from "./Register.module.scss";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Alert } from "@mui/material";
+import { register } from "../../api/authApi";
+import images from "../../assets/img";
 
 const cx = classNames.bind(styles);
-
+const bgStyle = {
+  "--bg-image": `url(${images.bg2})`,
+} as React.CSSProperties;
 const Register = () => {
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target as HTMLFormElement);
-    const username = formData.get("username")?.toString().trim();
-    const password = formData.get("password")?.toString().trim();
-
-    if (!username || !password) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+    if (
+      !form.username.trim() ||
+      !form.password.trim() ||
+      !form.confirmPassword.trim()
+    ) {
+      setError("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+    if (form.password.length < 6) {
+      setError("Mật khẩu phải có ít nhất 6 ký tự!");
       return;
     }
 
-    dispatch(register({ username, password }));
+    if (form.password !== form.confirmPassword) {
+      setError("Mật khẩu nhập lại không khớp!");
+      return;
+    }
 
-    alert("Đăng ký thành công!");
-    navigate("/login"); 
+    try {
+      await register({ username: form.username, password: form.password });
+      setSuccess("Đăng ký thành công!");
+
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
-  
 
   return (
-    <div className={cx("register")}>
+    <div className={cx("register")} style={bgStyle}>
       <div className={cx("card")}>
         <div className={cx("left")}>
-          <h1>Lama Social.</h1>
+          <h1>QNUwU</h1>
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero cum,
-            alias totam numquam ipsa exercitationem dignissimos, error nam,
-            consequatur.
+            QNUwU – nơi kết nối, chia sẻ và bùng nổ sáng tạo! Cùng nhau xây dựng
+            một cộng đồng năng động, nơi mọi ý tưởng được lắng nghe, mọi khoảnh
+            khắc đều đáng nhớ và mọi cơ hội luôn rộng mở. Hãy tham gia ngay để
+            không bỏ lỡ bất kỳ điều thú vị nào!
           </p>
-          <span>Do you have an account?</span>
+          <span>Đã có tài khoản?</span>
           <Link to="/login">
-          <button>Login</button>
+            <button>Đăng nhập</button>
           </Link>
         </div>
         <div className={cx("right")}>
-          <h1>Register</h1>
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
+          <h1>Đăng ký</h1>
           <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Username" name="username"  />
-            <input type="password" placeholder="Password" name="password" />
-            
-            <button type="submit">Register</button>
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              onChange={handleChange}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              onChange={handleChange}
+            />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              autoComplete="off"
+            />
+
+            <button type="submit">Đăng ký</button>
           </form>
         </div>
       </div>
