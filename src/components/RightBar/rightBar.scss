@@ -73,6 +73,22 @@
               color: themed("textColor");
             }
           }
+          .follow {
+            border: none;
+            padding: 5px;
+            color: white;
+            cursor: pointer;
+            background-color: #5271ff;
+            border-radius: 3px;
+          }
+          .unfollow {
+            border: none;
+            padding: 5px;
+            color: white;
+            cursor: pointer;
+            background-color: #f0544f;
+            border-radius: 3px;
+          }
 
           .buttons {
             display: flex;

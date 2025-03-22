@@ -2,14 +2,16 @@ export interface User {
   id: number;
   username: string;
   password: string;
+  avatar: string;
   followers: number[];
   following: number[];
+  bio?: string;
 }
 
 const USERS_KEY = "users";
 const AUTH_KEY = "authUser";
 
-const getUsers = (): User[] => {
+export const getUsers = (): User[] => {
   return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
 };
 
@@ -63,38 +65,63 @@ export const getAllUsers = (): User[] => {
   return getUsers().filter((user) => user.id !== currentUser?.id);
 };
 
+export const getUserById = (userId: number): User | null => {
+  return getUsers().find((user) => user.id === userId) || null;
+};
+
 export const followUser = (userId: number) => {
   const users = getUsers();
   const currentUser = getCurrentUser();
-
   if (!currentUser) return;
 
   const targetUser = users.find((u) => u.id === userId);
-  if (!targetUser) return;
+  const currentUserIndex = users.findIndex((u) => u.id === currentUser.id);
+  
+  if (!targetUser || currentUserIndex === -1) return;
 
   if (!currentUser.following.includes(userId)) {
-    currentUser.following.push(userId);
+    users[currentUserIndex].following.push(userId);
     targetUser.followers.push(currentUser.id);
   }
 
   saveUsers(users);
-  localStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+  localStorage.setItem(AUTH_KEY, JSON.stringify(users[currentUserIndex]));
 };
+
 
 export const unfollowUser = (userId: number) => {
   const users = getUsers();
   const currentUser = getCurrentUser();
-
   if (!currentUser) return;
 
   const targetUser = users.find((u) => u.id === userId);
-  if (!targetUser) return;
+  const currentUserIndex = users.findIndex((u) => u.id === currentUser.id);
+  
+  if (!targetUser || currentUserIndex === -1) return;
 
-  currentUser.following = currentUser.following.filter((id) => id !== userId);
-  targetUser.followers = targetUser.followers.filter(
-    (id) => id !== currentUser.id,
-  );
+  users[currentUserIndex].following = users[currentUserIndex].following.filter((id) => id !== userId);
+  targetUser.followers = targetUser.followers.filter((id) => id !== currentUser.id);
 
   saveUsers(users);
-  localStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+  localStorage.setItem(AUTH_KEY, JSON.stringify(users[currentUserIndex]));
 };
+
+
+export const updateUser = (updatedUser: Partial<User>) => {
+  const users = getUsers();
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+
+  const userIndex = users.findIndex((u) => u.id === currentUser.id);
+  if (userIndex === -1) return;
+
+  users[userIndex] = { 
+    ...users[userIndex], 
+    ...updatedUser, 
+    password: users[userIndex].password 
+  };
+
+  saveUsers(users);
+  localStorage.setItem(AUTH_KEY, JSON.stringify(users[userIndex]));
+};
+

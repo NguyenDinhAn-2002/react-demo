@@ -2,7 +2,7 @@ import { Typography, Avatar } from "@mui/material";
 import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
 import CustomMenu from "../CustomMenu/CustomMenu";
 import images from "../../assets/img";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.scss";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
@@ -10,10 +10,10 @@ const Navbar = () => {
   const user = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [openMenu, setOpenMenu] = useState(false);
+  const navigate = useNavigate();
   const [confirmLogout, setConfirmLogout] = useState(false);
   const menuItems = [
-    { label: user?.user?.username || "Người dùng", onClick: () => {} },
-    { label: "Hồ sơ của bạn", onClick: () => console.log("Xem hồ sơ") },
+    { label: "Hồ sơ của bạn", onClick: () => {navigate(`/profile/${user.user?.id}`)} },
     { label: "Đăng xuất", onClick: () => setConfirmLogout(true) },
   ];
   const handleLogout = () => {
@@ -45,6 +45,7 @@ const Navbar = () => {
           </Typography>
           <div className="user">
             <Avatar
+              src={user.user?.avatar}
               onClick={(event: React.MouseEvent<HTMLDivElement>) => {
                 setAnchorEl(event.currentTarget);
                 setOpenMenu(true);

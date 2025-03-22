@@ -1,4 +1,3 @@
-import "./LeftBar.scss";
 import {
   Group,
   Storefront,
@@ -9,15 +8,10 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+import "./LeftBar.scss";
 function LeftBar() {
   const currentUser = useAuth();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    currentUser.logout();
-    navigate("/login");
-  }
-
   return (
     <div className="leftBar">
       <div className="container">
@@ -28,7 +22,7 @@ function LeftBar() {
           </div>
           <div className="item">
             <Feed />
-            <span>Bài đăng</span>
+            <span onClick={() => navigate("/")}>Bài đăng</span>
           </div>
           <div className="item">
             <PeopleAlt />
@@ -44,9 +38,6 @@ function LeftBar() {
           </div>
         </div>
         <hr />
-        <div className="item">
-          <button className="btn-logout" onClick={() => handleLogout()}>Đăng xuất</button>
-        </div>
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
-import { Link } from "react-router-dom";
-import { Alert } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Snackbar, Alert } from "@mui/material";
 import { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
 import { useAuth } from "../../contexts/AuthContext";
 import images from "../../assets/img";
+
 const bgStyle = {
   "--bg-image": `url(${images.bg})`,
 } as React.CSSProperties;
@@ -14,35 +14,46 @@ const cx = classNames.bind(styles);
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState<"success" | "error">("success");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
 
   const user = useAuth();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
-      setError("Vui lòng điền đầy đủ thông tin!");
+      setMessage("Vui lòng điền đầy đủ thông tin!");
+      setSeverity("error");
+      setOpenSnackbar(true);
       return;
     }
-
+  
     try {
-      const authUser = await user.login(username, password);
-
+      const authUser = await user.validateLogin(username, password); 
+  
       if (authUser) {
-        setSuccess("Đăng nhập thành công!");
-        setTimeout(() => {
-          console.log("Navigating to /home");
+        setMessage("Đăng nhập thành công!");
+        setSeverity("success");
+        setOpenSnackbar(true);
+  
+        setTimeout(async () => {
+          await user.login(username, password);
           navigate("/home");
         }, 2000);
       } else {
-        setError("Sai tên đăng nhập hoặc mật khẩu!");
+        setMessage("Sai tên đăng nhập hoặc mật khẩu!");
+        setSeverity("error");
+        setOpenSnackbar(true);
       }
     } catch (err) {
-      setError("Đã xảy ra lỗi khi đăng nhập!");
+      setMessage("Đã xảy ra lỗi khi đăng nhập!");
+      setSeverity("error");
+      setOpenSnackbar(true);
     }
   };
-
+  
   return (
     <div className={cx("login")}>
       <div className={cx("card")}>
@@ -63,10 +74,7 @@ const Login = () => {
           </Link>
         </div>
         <div className={cx("right")}>
-          {error && <Alert severity="error">{error}</Alert>}
-          {success && <Alert severity="error">{success}</Alert>}
           <h1>Đăng nhập</h1>
-
           <form onSubmit={handleSubmit}>
             <input
               type="text"
@@ -80,11 +88,20 @@ const Login = () => {
               name="password"
               onChange={(e) => setPassword(e.target.value)}
             />
-
             <button type="submit">Đăng nhập</button>
           </form>
         </div>
       </div>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity={severity}>
+          {message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

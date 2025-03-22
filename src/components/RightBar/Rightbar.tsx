@@ -1,46 +1,28 @@
 import { useState, useEffect } from "react";
-import { getAllUsers, getCurrentUser } from "../../api/authApi";
-import { followUser, getFollowing } from "../../api/followApi";
+import { getAllUsers, User } from "../../api/authApi";
 import { Typography, Avatar } from "@mui/material";
+import { useAuth } from "../../contexts/AuthContext";
 import "./rightBar.scss";
+
 const RightBar = () => {
-  const [suggestedUsers, setSuggestedUsers] = useState<
-    { id: number; username: string }[]
-  >([]);
-  const [followingList, setFollowingList] = useState<
-    { id: number; username: string }[]
-  >([]);
+  const { user, follow, unfollow } = useAuth();
+  const [suggestedUsers, setSuggestedUsers] = useState<User[]>([]);
+  const [followingList, setFollowingList] = useState<User[]>([]);
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) return;
 
     const allUsers = getAllUsers();
-    const followingIds = getFollowing(user.id);
-
-    const notFollowedUsers = allUsers.filter(
-      (u) => !followingIds.includes(u.id) && u.id !== user.id,
-    );
-    setSuggestedUsers(notFollowedUsers);
-
-    const followedUsers = allUsers.filter((u) => followingIds.includes(u.id));
-    setFollowingList(followedUsers);
-  }, []);
+    setSuggestedUsers(allUsers.filter((u) => !user.following.includes(u.id)));
+    setFollowingList(allUsers.filter((u) => user.following.includes(u.id)));
+  }, [user]);
 
   const handleFollow = (userId: number) => {
-    const user = getCurrentUser();
-    if (!user) return alert("Bạn cần đăng nhập!");
-
-    followUser(user.id, userId);
-    setSuggestedUsers((prev) => prev.filter((u) => u.id !== userId));
-    setFollowingList((prev) => [
-      ...prev,
-      suggestedUsers.find((u) => u.id === userId)!,
-    ]);
+    follow(userId);
   };
 
-  const handleDismiss = (userId: number) => {
-    setSuggestedUsers((prev) => prev.filter((u) => u.id !== userId));
+  const handleUnfollow = (userId: number) => {
+    unfollow(userId);
   };
 
   return (
@@ -50,42 +32,45 @@ const RightBar = () => {
           <Typography variant="h6" fontWeight="bold">
             Người bạn có thể biết
           </Typography>
-
           {suggestedUsers.length === 0 ? (
-            <div>
-              <span>Không còn ai để gợi ý.</span>
-            </div>
+            <span>Không còn ai để gợi ý.</span>
           ) : (
             suggestedUsers.map((user) => (
               <div key={user.id} className="user">
                 <div className="userInfo">
-                  <Avatar src="" alt="" />
+                  <Avatar src={user.avatar} alt={user.username} />
                   <span>{user.username}</span>
                 </div>
-                <div className="buttons">
-                  <button onClick={() => handleFollow(user.id)}>Follow</button>
-                  <button onClick={() => handleDismiss(user.id)}>
-                    Dismiss
-                  </button>
-                </div>
+                <button
+                  className="follow"
+                  onClick={() => handleFollow(user.id)}
+                >
+                  Follow
+                </button>
               </div>
             ))
           )}
         </div>
+
         <div className="item">
           <Typography variant="h6" fontWeight="bold">
             Đang theo dõi
           </Typography>
-
           {followingList.length === 0 ? (
             <span>Bạn chưa follow ai.</span>
           ) : (
             followingList.map((user) => (
               <div key={user.id} className="user">
                 <div className="userInfo">
-                  <Avatar />
+                  <Avatar src={user.avatar} alt={user.username} />
                   <span>{user.username}</span>
                 </div>
+                <button
+                  className="unfollow"
+                  onClick={() => handleUnfollow(user.id)}
+                >
+                  Unfollow
+                </button>
               </div>
             ))
           )}

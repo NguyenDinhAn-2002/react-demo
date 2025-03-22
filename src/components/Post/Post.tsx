@@ -9,10 +9,12 @@ import {
 import "./Post.scss";
 import { Post, toggleLikePost } from "../../api/postApi";
 import Typography from "@mui/material/Typography";
-import images from "../../assets/img";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import Comments from "../Comments/Comments";
+import { getUserById } from "../../api/authApi"; 
+
+
 
 const PostItem = ({
   post,
@@ -21,16 +23,17 @@ const PostItem = ({
   post: Post;
   currentUserId: number;
 }) => {
+  const userInfo = getUserById(post.userId);
   const [commentOpen, setCommentOpen] = useState(false);
   const [likes, setLikes] = useState(
-    Array.isArray(post.like) ? post.like.length : 0,
+    Array.isArray(post.like) ? post.like.length : 0
   );
 
   const [isLiked, setIsLiked] = useState(
-    Array.isArray(post.like) && post.like.includes(currentUserId),
+    Array.isArray(post.like) && post.like.includes(currentUserId)
   );
   const [commentsCount, setCommentsCount] = useState(
-    Array.isArray(post.comment) ? post.comment.length : 0,
+    Array.isArray(post.comment) ? post.comment.length : 0
   );
 
   const handleCommentAdded = () => {
@@ -58,18 +61,18 @@ const PostItem = ({
       <div className="post">
         <div className="container">
           <div className="user">
-            <div className="userInfo">
-              <img src={images.avatar10} alt="" />
-              <div className="details">
                 <Link
                   to={`/profile/${post.userId}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
-                  <span className="name">{post.username}</span>
-                </Link>
+            <div className="userInfo">
+              <img src={userInfo?.avatar} alt="" />
+              <div className="details">
+                  <span className="name">{userInfo?.username}</span>
                 <span className="date">{formattedDate}</span>
               </div>
             </div>
+                </Link>
             <MoreHoriz />
           </div>
           <div className="content">
@@ -80,7 +83,7 @@ const PostItem = ({
             {post.image && (
               <img
                 src={post.image}
-                alt=""
+                alt={post.title}
                 style={{ width: "100%", marginTop: "10px" }}
               />
             )}

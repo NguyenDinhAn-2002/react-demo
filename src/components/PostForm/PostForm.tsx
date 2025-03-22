@@ -1,11 +1,13 @@
-import images from "../../assets/img";
 import "./postForm.scss";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPost } from "../../api/postApi";
 import { getCurrentUser } from "../../api/authApi";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
-import { Alert } from "@mui/material"; 
+import { Alert } from "@mui/material";
+import { Snackbar } from "@mui/material";
+import { useAuth } from "../../contexts/AuthContext";
+
 
 const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
   const [title, setTitle] = useState("");
@@ -13,9 +15,21 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
   const [image, setImage] = useState<string | undefined>(undefined);
   const [confirmPost, setConfirmPost] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ title?: string; body?: string }>({});
   const [alertSeverity, setAlertSeverity] = useState<
     "success" | "warning" | "error" | "info" | undefined
   >(undefined);
+  const currentUser = useAuth();
+
+  useEffect(() => {
+    if (errors.title) {
+      const timer = setTimeout(() => {
+        setErrors((prev) => ({ ...prev, title: "", body: "" }));
+      }, 3000);
+  
+      return () => clearTimeout(timer); 
+    }
+  }, [errors.title]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -29,23 +43,27 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
     }
   };
 
-  const handleSubmit = () => {
-    if (!body) {
-      setAlertMessage("Vui lòng nhập nội dung bài viết!");
-      setAlertSeverity("warning");
-      setTimeout(() => setAlertMessage(null), 5000);
-      return;
-    }
+  const validate = () => {
+    const newErrors: { title?: string; body?: string } = {};
+    if (!title.trim()) newErrors.title = "Vui lòng nhập tiêu đề!";
+    if (!body.trim()) newErrors.body = "Vui lòng nhập nội dung bài viết!";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    const user = getCurrentUser();
-    if (!user) {
-      return;
+  const handlePostClick = () => {
+    if (validate()) {
+      setConfirmPost(true);
     }
+  };
+
+  const handleSubmit = () => {
+    const user = getCurrentUser();
+    if (!user) return;
 
     createPost({
       id: 0,
       userId: user.id,
-      username: user.username,
       title,
       body,
       image,
@@ -57,10 +75,11 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
     setConfirmPost(false);
     setAlertMessage("Đăng bài thành công!");
     setAlertSeverity("success");
-    setTimeout(() => setAlertMessage(null), 5000);
+    setConfirmPost(false);
     setTitle("");
     setBody("");
     setImage(undefined);
+    setErrors({});
     onPostCreated();
   };
 
@@ -68,22 +87,32 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
     <div className="postForm">
       <div className="container">
         <div className="top">
-          <img src={images.avatar10} alt="adad" />
+          <img src={currentUser?.user?.avatar} alt="avatar" />
           <input
             type="text"
             placeholder="Tiêu đề"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setErrors((prev) => ({ ...prev, title: "" }));
+            }}
           />
         </div>
+          {errors.title && <span className="error-text">{errors.title}</span>}
+
         <div className="top">
           <input
             type="text"
             placeholder="Nghĩ gì vậy?"
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={(e) => {
+              setBody(e.target.value);
+              setErrors((prev) => ({ ...prev, body: "" }));
+            }}
           />
         </div>
+          {errors.body && <span className="error-text">{errors.body}</span>}
+
         <hr />
         <div className="bottom">
           <div className="left">
@@ -102,24 +131,28 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
             </label>
           </div>
           <div className="right">
-            <button onClick={() => setConfirmPost(true)}>Đăng bài</button>
+            <button onClick={handlePostClick}>Đăng bài</button>
           </div>
         </div>
-        <div className="content">
-          {image && (
-            <img
-              src={image}
-              alt="Preview"
-              style={{ width: "100%", marginTop: 10 }}
-            />
-          )}
-        </div>
 
-        {alertMessage && (
-          <Alert severity={alertSeverity} sx={{ marginBottom: 2 }}>
+        {image && (
+          <img
+            src={image}
+            alt="Preview"
+            style={{ width: "100%", marginTop: 10 }}
+          />
+        )}
+
+        <Snackbar
+          open={!!alertMessage}
+          autoHideDuration={5000}
+          onClose={() => setAlertMessage(null)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert severity={alertSeverity} onClose={() => setAlertMessage(null)}>
             {alertMessage}
           </Alert>
-        )}
+        </Snackbar>
 
         <ConfirmDialog
           open={confirmPost}

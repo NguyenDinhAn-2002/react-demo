@@ -4,6 +4,8 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Home from "../pages/Home/Home";
 import { useAuth } from "../contexts/AuthContext";
+import Profile from "../pages/Profile/Profile";
+import EditProfile from "../pages/Profile/EditProfile";
 
 interface RouteItem {
   path: string;
@@ -17,6 +19,8 @@ const publicRoutes: RouteItem[] = [
   { path: "/login", component: Login, layout: null, requiresAuth: false },
   { path: "/register", component: Register, layout: null, requiresAuth: false },
   { path: "/home", component: Home, layout: DefaultLayout, requiresAuth: true },
+  { path: "/profile/:id", component: Profile, layout: DefaultLayout, requiresAuth: true }, 
+  { path: "/edit-profile/:id", component: EditProfile, layout: DefaultLayout, requiresAuth: true },
 ];
 
 const RouteGuard = ({

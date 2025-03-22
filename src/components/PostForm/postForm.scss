@@ -33,6 +33,15 @@
         }
       }
 
+      .error-text {
+        color: red;
+        font-size: 14px; 
+        font-weight: bold; 
+        text-align: center;
+        display: block;
+        margin-top: 5px;
+      }
+
       hr {
         margin: 20px 0px;
         border: none;

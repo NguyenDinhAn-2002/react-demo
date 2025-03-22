@@ -1,7 +1,7 @@
+import { getUserById } from "./authApi";
 export interface Post {
   id: number;
   userId: number;
-  username: string;
   title: string;
   body: string;
   image?: string;
@@ -12,7 +12,6 @@ export interface Post {
 
 export interface Comment {
   userId: number;
-  username: string;
   text: string;
   createdAt: number;
 }
@@ -40,10 +39,17 @@ export const createPost = (post: Post) => {
   console.log("Post created:", post);
 };
 
-export const fetchPosts = (): Post[] => {
-  return getPosts();
+export const fetchPosts = () => {
+  const posts = getPosts();
+  return posts.map((post) => ({
+    ...post,
+    user: getUserById(post.userId), 
+    comment: post.comment.map((c) => ({
+      ...c,
+      user: getUserById(c.userId), 
+    })),
+  }));
 };
-
 export const toggleLikePost = (postId: number, userId: number) => {
   const posts = getPosts();
   const post = posts.find((p) => p.id === postId);
@@ -59,21 +65,17 @@ export const toggleLikePost = (postId: number, userId: number) => {
   }
 };
 
+
 export const addCommentToPost = (
   postId: number,
   userId: number,
-  username: string,
-  text: string,
+  text: string
 ) => {
   const posts = getPosts();
   const post = posts.find((p) => p.id === postId);
 
   if (post) {
-    if (!Array.isArray(post.comment)) {
-      post.comment = [];
-    }
-
-    post.comment.push({ userId, username, text, createdAt: Date.now() });
+    post.comment.push({ userId, text, createdAt: Date.now() });
     savePosts(posts);
   }
 };
