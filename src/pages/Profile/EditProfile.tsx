@@ -10,6 +10,7 @@ import {
   Button,
   IconButton,
   Box,
+  TextField,
 } from "@mui/material";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
@@ -20,8 +21,9 @@ const EditProfile = () => {
   const navigate = useNavigate();
   const [avatar, setAvatar] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>("");
+  const [bio, setBio] = useState<string>("");
   const [open, setOpen] = useState(false);
-  const [isChanged, setIsChanged] = useState(false); 
+  const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
     if (!user || Number(id) !== user.id) {
@@ -32,6 +34,7 @@ const EditProfile = () => {
     const userData = getUserById(user.id);
     if (userData) {
       setPreview(userData.avatar);
+      setBio(userData.bio || "");
     }
   }, [id, user, navigate]);
 
@@ -39,7 +42,7 @@ const EditProfile = () => {
     if (e.target.files && e.target.files[0]) {
       setAvatar(e.target.files[0]);
       setPreview(URL.createObjectURL(e.target.files[0]));
-      setIsChanged(true); 
+      setIsChanged(true);
     }
   };
 
@@ -47,11 +50,10 @@ const EditProfile = () => {
     if (!user || !isChanged) return;
 
     const avatarUrl = avatar ? URL.createObjectURL(avatar) : preview;
-    updateUser({ ...user, avatar: avatarUrl });
+    updateUser({ ...user, avatar: avatarUrl, bio });
 
     setIsChanged(false);
     navigate(`/profile/${user.id}`);
-
   };
 
   return (
@@ -93,13 +95,26 @@ const EditProfile = () => {
               />
             </IconButton>
           </Box>
+          <TextField
+            fullWidth
+            label="Giới thiệu bản thân"
+            multiline
+            rows={3}
+            value={bio}
+            onChange={(e) => {
+              setBio(e.target.value);
+              setIsChanged(true);
+            }}
+            margin="normal"
+          />
+
           <Box mt={3}>
             <Button
               variant="contained"
               color="primary"
               onClick={() => setOpen(true)}
               sx={{ mr: 2 }}
-              disabled={!isChanged} 
+              disabled={!isChanged}
             >
               Lưu
             </Button>
