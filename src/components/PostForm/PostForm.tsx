@@ -4,10 +4,8 @@ import { createPost } from "../../api/postApi";
 import { getCurrentUser } from "../../api/authApi";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
-import { Alert } from "@mui/material";
-import { Snackbar } from "@mui/material";
+import { Snackbar,TextField,Alert } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
-
 
 const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
   const [title, setTitle] = useState("");
@@ -26,8 +24,8 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
       const timer = setTimeout(() => {
         setErrors((prev) => ({ ...prev, title: "", body: "" }));
       }, 3000);
-  
-      return () => clearTimeout(timer); 
+
+      return () => clearTimeout(timer);
     }
   }, [errors.title]);
 
@@ -98,21 +96,29 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
             }}
           />
         </div>
-          {errors.title && <span className="error-text">{errors.title}</span>}
-
+        {errors.title && <span className="error-text">{errors.title}</span>}
         <div className="top">
-          <input
-            type="text"
-            placeholder="Nghĩ gì vậy?"
+          <TextField
+            fullWidth
+            label="Nghĩ gì vậy?"
+            multiline
+            minRows={1}
+            maxRows={10}
             value={body}
-            onChange={(e) => {
-              setBody(e.target.value);
-              setErrors((prev) => ({ ...prev, body: "" }));
-            }}
+            onChange={(e) => setBody(e.target.value)}
+            margin="normal"
+            variant="standard"
           />
         </div>
-          {errors.body && <span className="error-text">{errors.body}</span>}
+        {errors.body && <span className="error-text">{errors.body}</span>}
 
+        {image && (
+          <img
+          src={image}
+          alt="Preview"
+          style={{ width: "100%", marginTop: 10 }}
+          />
+        )}
         <hr />
         <div className="bottom">
           <div className="left">
@@ -134,14 +140,6 @@ const PostForm = ({ onPostCreated }: { onPostCreated: () => void }) => {
             <button onClick={handlePostClick}>Đăng bài</button>
           </div>
         </div>
-
-        {image && (
-          <img
-            src={image}
-            alt="Preview"
-            style={{ width: "100%", marginTop: 10 }}
-          />
-        )}
 
         <Snackbar
           open={!!alertMessage}
