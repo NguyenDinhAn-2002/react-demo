@@ -10,10 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.8",
+    "@mui/material": "^6.4.8",
+    "classnames": "^2.5.1",
     "react": "^19.0.0",
     "react-demo": "file:",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.3.0"
+    "react-router-dom": "^7.3.0",
+    "sass": "^1.86.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

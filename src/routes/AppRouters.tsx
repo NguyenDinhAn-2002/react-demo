@@ -1,16 +1,25 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Register from "../pages/Register";
-import Login from "../pages/Login";
-import Dashboard from "../pages/Dashboard";
+import { publicRoutes, RouteGuard } from "./routes";
+import { Fragment } from "react";
+import { DefaultLayout } from "../layouts";
 
 const AppRoutes = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        {publicRoutes.map(
+          ({path, component: Component, layout, requireAuth}, index) => {
+            const Layout = layout === null ? Fragment : layout || DefaultLayout;
+            return (
+              <Route
+                key={index}
+                path={path}
+                element={<RouteGuard requireAuth={requireAuth}><Layout><Component /></Layout></RouteGuard>}
+              >
+                <Route index element={<Component />} />
+              </Route>
+            );
+        })}
       </Routes>
     </Router>
   );
