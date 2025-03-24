@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, ReactNode } from "react";
+import { createContext, useState, useContext, ReactNode, useEffect } from "react";
 
 interface User {
   username: string;
@@ -22,6 +22,13 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const authUser = JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
+    if (authUser) {
+      setUser(authUser);
+    }
+  }, []);
 
   const handleLogin = (username: string, password: string) => {
     const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
