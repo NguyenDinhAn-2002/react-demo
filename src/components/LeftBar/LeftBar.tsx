@@ -8,7 +8,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-import "./LeftBar.scss";
+import "./leftBar.scss";
 function LeftBar() {
   const currentUser = useAuth();
   const navigate = useNavigate();
