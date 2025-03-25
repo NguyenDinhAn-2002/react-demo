@@ -78,8 +78,12 @@ const Register = () => {
       setTimeout(() => {
         navigate("/login");
       }, 3000);
-    } catch (err: any) {
-      setErrors({ ...errors, username: err.message });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrors({ ...errors, username: err.message });
+      } else {
+        setErrors({ ...errors, username: "An unknown error occurred." });
+      }
     }
   };
 
